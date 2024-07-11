@@ -9,10 +9,12 @@ import "package:http/http.dart" as http;
 import "dart:convert";
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -20,6 +22,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (ctx) => PaDataProvider()),
         ],
         child: MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'Hospital Management System',
           theme: ThemeData(
             primarySwatch: Colors.blue,
@@ -30,6 +33,8 @@ class MyApp extends StatelessWidget {
 }
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -44,7 +49,10 @@ class _LoginPageState extends State<LoginPage> {
       // Navigate to DashboardPage on successful login
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => DashboardPage()),
+        MaterialPageRoute(
+            builder: (context) => const DashboardPage(
+                  firstName: '',
+                )),
       );
     }
   }
@@ -53,22 +61,22 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login Page'),
+        title: const Text('Login Page'),
       ),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  SizedBox(height: 1.0),
+                  const SizedBox(height: 1.0),
                   Image.asset('assets/image/logo1.png', height: 300.0),
-                  SizedBox(height: 15.0),
-                  SizedBox(height: 20.0),
+                  const SizedBox(height: 15.0),
+                  const SizedBox(height: 20.0),
                   TextFormField(
                     controller: _usernameController,
                     decoration: InputDecoration(
@@ -84,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 20.0),
+                  const SizedBox(height: 20.0),
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
@@ -101,13 +109,13 @@ class _LoginPageState extends State<LoginPage> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 20.0),
+                  const SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: _login,
-                    child: Text('Login'),
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
                     ),
+                    child: const Text('Login'),
                   ),
                 ],
               ),

@@ -24,7 +24,7 @@ class PatientPage extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (context) =>
-                      DashboardPage()), // Navigate back to the dashboard
+                      DashboardPage(firstName: '',)), // Navigate back to the dashboard
             );
           },
         ),
@@ -94,7 +94,7 @@ class PatientPage extends StatelessWidget {
           if (index == 0) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DashboardPage()),
+              MaterialPageRoute(builder: (context) => DashboardPage(firstName: '',)),
             );
           } else if (index == 1) {
             Navigator.push(

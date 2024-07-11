@@ -13,6 +13,9 @@ import 'package:carousel_slider/carousel_slider.dart'; // Import the carousel_sl
 // import 'loginpage.dart';
 
 class DashboardPage extends StatefulWidget {
+  final String? firstName;
+
+  const DashboardPage({super.key, required this.firstName});
   @override
   State<DashboardPage> createState() => _DashboardPageState();
 }
@@ -28,9 +31,9 @@ class _DashboardPageState extends State<DashboardPage> {
   // const Dashboard({Key? key, required response}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<PaDataProvider>(context);
+    final userProvider = Provider.of<PaDataProvider>(context); 
     final data = userProvider.responseData.value;
-    print(data ?? "nai");
+    print(data ?? context.read<PaDataProvider>().firstName);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -49,17 +52,17 @@ class _DashboardPageState extends State<DashboardPage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Welcome',
                             style: TextStyle(color: Colors.white, fontSize: 50),
                           ),
-                          SizedBox(height: 8.0),
+                          const SizedBox(height: 8.0),
                           Text(
                             data?.fname ?? "na",
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 30.0),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 30.0),
                           ),
-                          SizedBox(height: 8.0),
+                          const SizedBox(height: 8.0),
                         ],
                       ),
                     ],
@@ -178,7 +181,7 @@ class _DashboardPageState extends State<DashboardPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Our Services',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
@@ -295,7 +298,7 @@ class ServiceItem extends StatelessWidget {
   final String title;
   final IconData icon;
 
-  const ServiceItem({required this.title, required this.icon});
+  const ServiceItem({super.key, required this.title, required this.icon});
 
   @override
   Widget build(BuildContext context) {

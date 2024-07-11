@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:frontend_new/Controller/AccController.dart';
+import 'package:frontend_new/model/AccModel.dart';
+import 'package:provider/provider.dart';
 import '../dashboardpage/dashboardpage.dart';
 import 'package:http/http.dart' as http;
 import '../dashboardpage/api for resetpassword/passwordresetpage.dart';
@@ -22,16 +27,19 @@ import '../global.dart' as globals;
 // }
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _passwordVisible = false;
 
+  @override
   void initState() {
     _passwordVisible = false;
   }
@@ -41,24 +49,36 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _login() async {
-    // if (_formKey.currentState?.validate() ?? false) {
-    print('func vitra aye');
-
-    Uri url = Uri.parse('http://127.0.0.1:8000/api/login');
-    var response = await http.post(url, body: {
-      "email": _usernameController.text,
-      "password": _passwordController.text,
-    });
-
-    // Handle login logic
-    String username = _usernameController.text;
-    String password = _passwordController.text;
-    print('Username: $username, Password: $password');
-    print(response.body);
-    Navigator.push(
-        // ignore: use_build_context_synchronously
-        context,
-        MaterialPageRoute(builder: (context) => DashboardPage()));
+    if (_formKey.currentState!.validate()) {
+      Uri url = Uri.parse('http://127.0.0.1:8000/api/login');
+      var response = await http.post(url, body: {
+        "email": _usernameController.text,
+        "password": _passwordController.text,
+      });
+      try {
+        if (response.statusCode == 200) {
+          var jsonResult = jsonDecode(response.body);
+          var result = Accmodel.fromJson(jsonResult);
+          var userName = result.value?.fname;
+          context.read<PaDataProvider>().setLoginStatusActive();
+          context.read<PaDataProvider>().setUserLoginData(userName!);
+          Navigator.push(
+              // ignore: use_build_context_synchronously
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DashboardPage(
+                        firstName: userName,
+                      )));
+        } else {
+          print('error');
+        }
+      } catch (e) {
+        print("Exception occured"); // Write your exception code
+      }
+    } else {
+      // Perform action if validation is failed
+      print("Validation failed");
+    }
   }
 
   // }
@@ -98,21 +118,21 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login Page'),
+        title: const Text('Login Page'),
       ),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  SizedBox(height: 1.0),
+                  const SizedBox(height: 1.0),
                   Image.asset('assets/image/logo1.png', height: 300.0),
-                  SizedBox(height: 15.0),
+                  const SizedBox(height: 15.0),
                   TextFormField(
                     controller: _usernameController,
                     decoration: InputDecoration(
@@ -121,9 +141,20 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(30.0),
                       ),
                     ),
-                    // validator: _emailValidator,  //(validation ko lagi)
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      String pattern =
+                          r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
+                      RegExp regex = RegExp(pattern);
+                      if (!regex.hasMatch(value)) {
+                        return 'Enter a valid email address';
+                      }
+                      return null;
+                    },
                   ),
-                  SizedBox(height: 20.0),
+                  const SizedBox(height: 20.0),
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
@@ -132,20 +163,28 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(30.0),
                       ),
                     ),
-                    // obscureText: true,   //(validation ko lagi)
-                    // validator: _passwordValidator,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      // if (value.length < 8) {
+                      //   return 'Password must be at least 8 characters long';
+                      // }
+
+                      return null;
+                    },
                   ),
-                  SizedBox(height: 20.0),
+                  const SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: _login,
-                    child: Text('Login'),
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
                     ),
+                    child: const Text('Login'),
                   ),
                   TextButton(
                     onPressed: _navigateToResetPassword,
-                    child: Text('Forgot Password?'),
+                    child: const Text('Forgot Password?'),
                   ),
                 ],
               ),
