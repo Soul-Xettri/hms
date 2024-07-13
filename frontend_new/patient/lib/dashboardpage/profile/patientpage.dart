@@ -20,6 +20,10 @@ class PatientPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = context.watch<PaDataProvider>().account?.value;
+    print(data?.role);
+    final int paId =
+        data?.paId ?? 0; // Assuming pa_id is part of the data model
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
@@ -30,7 +34,8 @@ class PatientPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DashboardPage(firstName: ''),
+                builder: (context) =>
+                    DashboardPage(firstName: data?.fname ?? ''),
               ), // Navigate back to the dashboard
             );
           },
@@ -41,7 +46,8 @@ class PatientPage extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
+                MaterialPageRoute(
+                    builder: (context) => ProfilePage(paId: paId)),
               );
             },
           ),
@@ -106,7 +112,8 @@ class PatientPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DashboardPage(firstName: ''),
+                builder: (context) =>
+                    DashboardPage(firstName: data?.fname ?? ''),
               ),
             );
           } else if (index == 1) {

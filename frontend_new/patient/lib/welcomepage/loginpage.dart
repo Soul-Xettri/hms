@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
           var userName = result.value?.fname;
           context.read<PaDataProvider>().setLoginStatusActive();
           context.read<PaDataProvider>().setUserLoginData(result);
-          print(userName);
+          print(result);
           Navigator.push(
             // ignore: use_build_context_synchronously
             context,

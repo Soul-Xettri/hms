@@ -7,6 +7,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ProfilePage extends StatefulWidget {
+  final int? paId;
+  const ProfilePage({super.key, this.paId});
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -32,7 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       final response = await http.put(
         Uri.parse(
-            'http://127.0.0.1:8000/api/paupdate/1'), // Adjust the ID as needed
+            'http://127.0.0.1:8000/api/paupdate/${widget.paId}'), // Use the passed paId here
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'fname': newFirstName,
