@@ -10,18 +10,17 @@ import 'package:frontend_new/model/AccModel.dart';
 import 'package:http/http.dart' as http;
 
 class PaDataProvider with ChangeNotifier {
-  Accmodel responseData = Accmodel(); 
+  Accmodel responseData = Accmodel();
   bool isLoggedIn = false;
   bool isLoading = false;
 
-  // Accmodel? _account;
-  // Accmodel? get account => _account;
-
+  Accmodel? _account;
+  Accmodel? get account => _account;
 
   String? _firstName;
   String? get firstName => _firstName;
 
-  void setLoginStatusActive(){
+  void setLoginStatusActive() {
     isLoggedIn = true;
     notifyListeners();
   }
@@ -33,8 +32,8 @@ class PaDataProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setUserLoginData(String name){
-    _firstName = name;
+  void setUserLoginData(Accmodel value) {
+    _account = value;
     notifyListeners();
   }
 

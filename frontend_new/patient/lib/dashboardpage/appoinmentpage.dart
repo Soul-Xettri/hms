@@ -16,14 +16,14 @@ class AppointmentPage extends StatefulWidget {
 class _AppointmentPageState extends State<AppointmentPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _pnmController = TextEditingController(); // Changed from npm to pnm
+  final TextEditingController _pnmController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   String? _selectedTime;
 
   @override
   void dispose() {
     _nameController.dispose();
-    _pnmController.dispose(); // Updated from npm to pnm
+    _pnmController.dispose();
     _dateController.dispose();
     super.dispose();
   }
@@ -46,7 +46,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
   Future<void> _bookAppointment() async {
     if (_formKey.currentState?.validate() ?? false) {
       final String name = _nameController.text;
-      final String pnm = _pnmController.text; // Updated from npm to pnm
+      final String pnm = _pnmController.text;
       final String date = _dateController.text;
       final String time = _selectedTime ?? ""; // Ensure time is not null
 
@@ -54,7 +54,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
       final Map<String, dynamic> appointmentData = {
         'doctorId': widget.doctor.id, // Assuming Doctor model has an 'id' field
         'name': name,
-        'pnm': pnm, // Updated from npm to pnm
+        'pnm': pnm,
         'date': date,
         'time': time,
       };
@@ -106,6 +106,8 @@ class _AppointmentPageState extends State<AppointmentPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Book Appointment'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -113,10 +115,22 @@ class _AppointmentPageState extends State<AppointmentPage> {
           key: _formKey,
           child: ListView(
             children: [
-              Text('Booking an appointment with ${widget.doctor.name}'),
+              Text(
+                'Booking an appointment with ${widget.doctor.name}',
+                style: const TextStyle(
+                    fontSize: 18.0, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your name';
@@ -124,16 +138,25 @@ class _AppointmentPageState extends State<AppointmentPage> {
                   return null;
                 },
               ),
+              const SizedBox(height: 20),
               TextFormField(
-                controller: _pnmController, // Updated from npm to pnm
-                decoration: const InputDecoration(labelText: 'PNM'), // Updated from npm to pnm
+                controller: _pnmController,
+                decoration: InputDecoration(
+                  labelText: 'PNM',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your PNM'; // Updated from npm to pnm
+                    return 'Please enter your PNM';
                   }
                   return null;
                 },
               ),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _dateController,
                 decoration: InputDecoration(
@@ -142,6 +165,11 @@ class _AppointmentPageState extends State<AppointmentPage> {
                     icon: const Icon(Icons.calendar_today),
                     onPressed: () => _selectDate(context),
                   ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
                 ),
                 readOnly: true,
                 validator: (value) {
@@ -151,12 +179,14 @@ class _AppointmentPageState extends State<AppointmentPage> {
                   return null;
                 },
               ),
-              if (_dateController.text.isNotEmpty) // Show time selector if date is selected
-                FutureBuilder(
-                  future: _fetchAvailableTimes(DateTime.parse(_dateController.text)),
-                  builder: (context, AsyncSnapshot<List<String>> snapshot) {
+              const SizedBox(height: 20),
+              if (_dateController.text.isNotEmpty)
+                FutureBuilder<List<String>>(
+                  future: _fetchAvailableTimes(
+                      DateTime.parse(_dateController.text)),
+                  builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
+                      return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -175,8 +205,13 @@ class _AppointmentPageState extends State<AppointmentPage> {
                             child: Text(time),
                           );
                         }).toList(),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Preferred Time',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -191,7 +226,16 @@ class _AppointmentPageState extends State<AppointmentPage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _bookAppointment,
-                child: const Text('Book Appointment'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                child: const Text(
+                  'Book Appointment',
+                  style: TextStyle(fontSize: 18.0),
+                ),
               ),
             ],
           ),

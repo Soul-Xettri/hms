@@ -11,6 +11,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: SettingsPage(),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
     );
   }
 }
@@ -21,12 +25,15 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
+        backgroundColor: Colors.blue[800],
+        foregroundColor: Colors.white,
       ),
       body: ListView(
         padding: EdgeInsets.all(16.0),
         children: <Widget>[
           // Choose Language dropdown (Placeholder)
           ListTile(
+            leading: Icon(Icons.language, color: Colors.blue[800]),
             title: Text('Choose Language'),
             trailing: DropdownButton<String>(
               value: 'English',
@@ -43,6 +50,7 @@ class SettingsPage extends StatelessWidget {
           ),
           // Enable Notification switch (Placeholder)
           SwitchListTile(
+            secondary: Icon(Icons.notifications, color: Colors.blue[800]),
             title: Text('Enable Notification'),
             value: true, // Replace with your actual value
             onChanged: (bool value) {
@@ -51,16 +59,19 @@ class SettingsPage extends StatelessWidget {
           ),
           // App Version (Placeholder)
           ListTile(
+            leading: Icon(Icons.info, color: Colors.blue[800]),
             title: Text('App Version'),
             subtitle: Text('0.0.1'),
           ),
           // Terms & Conditions
           ListTile(
+            leading: Icon(Icons.policy, color: Colors.blue[800]),
             title: Text('Terms & Policy'),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => TermsAndPoliciesScreen()),
+                MaterialPageRoute(
+                    builder: (context) => TermsAndPoliciesScreen()),
               );
             },
           ),
@@ -68,6 +79,7 @@ class SettingsPage extends StatelessWidget {
           Divider(),
           // Change Password
           ListTile(
+            leading: Icon(Icons.lock, color: Colors.blue[800]),
             title: Text('Change Password'),
             onTap: () {
               Navigator.push(

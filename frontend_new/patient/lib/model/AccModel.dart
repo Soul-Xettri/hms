@@ -38,6 +38,7 @@ class Value {
   String? password;
   dynamic img1;
   String? role;
+  String? description;
   int? id;
   dynamic rememberToken;
   String? createdAt;

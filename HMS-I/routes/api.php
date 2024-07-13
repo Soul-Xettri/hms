@@ -22,6 +22,7 @@ Route::get("paview",[PatientApiController::class,'paview']);
 Route::get("paview-detail/{id}",[PatientApiController::class,'paviewed']); //viewed lai viewid banauni
 Route::get("paup/{id}",[PatientApiController::class,'paup']);
 Route::post("paregister",[PatientApiController::class,'pastore']);
+Route::post('/change-password', [PatientController::class, 'changePassword'])->name('change-password');
 Route::put("paupdate/{id}",[PatientApiController::class,'paupdate'])->name('pa.update.api');   
 
 

@@ -1,6 +1,3 @@
-
-
-
 import 'package:flutter/material.dart';
 
 class MyPrescriptionPage extends StatefulWidget {
@@ -9,22 +6,64 @@ class MyPrescriptionPage extends StatefulWidget {
 }
 
 class _MyPrescriptionPageState extends State<MyPrescriptionPage> {
-  String selectedPatient = '--Choose Patient--';
-  List<String> patients = ['--Choose Patient--', 'Kiran Sunar'];
-  bool hasPrescription = false;
+  String selectedDoctor = '--Choose Doctor--';
+  List<String> doctors = [
+    '--Choose Doctor--',
+    'Dr. John Doe',
+    'Dr. Jane Smith'
+  ];
+  List<Map<String, String>> prescriptions = [];
+  List<Map<String, String>> filteredPrescriptions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Adding some dummy data for demonstration purposes
+    prescriptions = [
+      {
+        'date': '2023-07-15',
+        'doctor': 'Dr. John Doe',
+        'medication': 'Amoxicillin 500mg',
+        'instructions': 'Take one capsule every 8 hours for 7 days.'
+      },
+      {
+        'date': '2023-06-10',
+        'doctor': 'Dr. Jane Smith',
+        'medication': 'Ibuprofen 200mg',
+        'instructions': 'Take one tablet every 6 hours as needed for pain.'
+      }
+    ];
+
+    // Initialize filteredPrescriptions with all prescriptions
+    filteredPrescriptions = prescriptions;
+  }
+
+  void _filterPrescriptions(String doctor) {
+    setState(() {
+      if (doctor == '--Choose Doctor--') {
+        filteredPrescriptions = prescriptions;
+      } else {
+        filteredPrescriptions = prescriptions
+            .where((prescription) => prescription['doctor'] == doctor)
+            .toList();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('My Prescription'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             DropdownButton<String>(
-              value: selectedPatient,
+              value: selectedDoctor,
               icon: Icon(Icons.arrow_downward),
               iconSize: 24,
               elevation: 16,
@@ -34,12 +73,14 @@ class _MyPrescriptionPageState extends State<MyPrescriptionPage> {
                 color: Colors.deepPurpleAccent,
               ),
               onChanged: (String? newValue) {
-                setState(() {
-                  selectedPatient = newValue!;
-                  hasPrescription = false; // Reset prescription status when patient changes
-                });
+                if (newValue != null) {
+                  setState(() {
+                    selectedDoctor = newValue;
+                  });
+                  _filterPrescriptions(newValue);
+                }
               },
-              items: patients.map<DropdownMenuItem<String>>((String value) {
+              items: doctors.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -47,34 +88,41 @@ class _MyPrescriptionPageState extends State<MyPrescriptionPage> {
               }).toList(),
             ),
             Expanded(
-              child: Center(
-                child: hasPrescription
-                    ? Text('You have prescriptions')
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+              child: ListView.builder(
+                itemCount: filteredPrescriptions.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.wifi_off,
-                            size: 50,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(height: 10),
                           Text(
-                            'No Any Prescription',
-                            style: TextStyle(color: Colors.grey, fontSize: 16),
+                            'Date: ${filteredPrescriptions[index]['date']}',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
                           ),
-                          SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                // Simulate fetching prescription data
-                                hasPrescription = !hasPrescription;
-                              });
-                            },
-                            child: Text('Refresh'),
+                          SizedBox(height: 8),
+                          Text(
+                            'Doctor: ${filteredPrescriptions[index]['doctor']}',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Medication: ${filteredPrescriptions[index]['medication']}',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Instructions: ${filteredPrescriptions[index]['instructions']}',
+                            style: TextStyle(fontSize: 16),
                           ),
                         ],
                       ),
+                    ),
+                  );
+                },
               ),
             ),
           ],

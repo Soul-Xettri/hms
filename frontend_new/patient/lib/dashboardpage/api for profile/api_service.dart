@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'https://your-api-url.com';
+  static const String baseUrl = 'http://127.0.0.1:8000/api/';
 
   static Future<Map<String, dynamic>> fetchProfile() async {
-    final response = await http.get(Uri.parse('$baseUrl/profile'));
+    final response = await http.get(Uri.parse('$baseUrl/paview'));
+    print(response.body);
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {

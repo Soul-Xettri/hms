@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'appoinmentpage.dart';
+import 'appoinmentpage.dart'; // Ensure this import path is correct
 
 void main() {
   runApp(MyApp());
@@ -65,21 +64,21 @@ class _SearchPageState extends State<SearchPage> {
       fee: 850,
       imageUrl: 'assets/image/doctor2.jpg',
     ),
-     Doctor(
+    Doctor(
       name: 'Dr. Kiran Sunar',
       specialization: 'Internal Medicine',
       experience: 2,
       fee: 850,
       imageUrl: 'assets/image/doctor3.jpg',
     ),
-     Doctor(
+    Doctor(
       name: 'Dr. Kiran Sunar',
       specialization: 'Internal Medicine',
       experience: 2,
       fee: 850,
       imageUrl: 'assets/image/doctor4.jpg',
     ),
-     Doctor(
+    Doctor(
       name: 'Dr. Kiran Sunar',
       specialization: 'Internal Medicine',
       experience: 2,
@@ -89,7 +88,26 @@ class _SearchPageState extends State<SearchPage> {
     // Add more doctor entries here
   ];
 
-  
+  List<Doctor> filteredDoctors = [];
+
+  @override
+  void initState() {
+    super.initState();
+    filteredDoctors = doctors;
+  }
+
+  void _filterDoctors(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredDoctors = doctors;
+      } else {
+        filteredDoctors = doctors
+            .where((doctor) =>
+                doctor.name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,13 +120,16 @@ class _SearchPageState extends State<SearchPage> {
             Navigator.pop(context); // Implement back button functionality
           },
         ),
-        backgroundColor: Colors.blue, // Ensure the AppBar background color is consistent
+        backgroundColor:
+            Colors.blue, // Ensure the AppBar background color is consistent
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
             TextField(
+              onChanged: _filterDoctors,
               decoration: InputDecoration(
                 hintText: 'Search By Keyword',
                 prefixIcon: const Icon(Icons.search),
@@ -118,21 +139,21 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
             const SizedBox(height: 16.0),
-            const SizedBox(height: 16.0),
             Expanded(
               child: ListView.builder(
-                itemCount: doctors.length,
+                itemCount: filteredDoctors.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DoctorDetailPage(doctor: doctors[index]),
+                          builder: (context) =>
+                              DoctorDetailPage(doctor: filteredDoctors[index]),
                         ),
                       );
                     },
-                    child: DoctorCard(doctor: doctors[index]),
+                    child: DoctorCard(doctor: filteredDoctors[index]),
                   );
                 },
               ),
@@ -207,7 +228,6 @@ class DoctorCard extends StatelessWidget {
   }
 }
 
-
 class DoctorDetailPage extends StatelessWidget {
   final Doctor doctor;
 
@@ -217,39 +237,77 @@ class DoctorDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         title: const Text('Doctor Details'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage(doctor.imageUrl),
-            ),
-            const SizedBox(height: 20.0),
-            Text(
-              'Name: ${doctor.name}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Text('Specialization: ${doctor.specialization}'),
-            Text('Experience: ${doctor.experience} years'),
-            Text('Fee: Rs. ${doctor.fee}'),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AppointmentPage(doctor: doctor),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage(doctor.imageUrl),
+              ),
+              const SizedBox(height: 20),
+              _buildProfileInfoRow(Icons.person, doctor.name),
+              _buildProfileInfoRow(Icons.healing, doctor.specialization),
+              _buildProfileInfoRow(Icons.calendar_today,
+                  'Experience: ${doctor.experience} years'),
+              _buildProfileInfoRow(Icons.money, 'Fee: Rs. ${doctor.fee}'),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AppointmentPage(doctor: doctor),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 30.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
                   ),
-                );
-              },
-              child: const Text('Book Appointment'),
-            ),
-          ],
+                ),
+                child: const Text(
+                  'Book Appointment',
+                ),
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildProfileInfoRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.blue),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(30.0),
+              ),
+              child: Text(
+                text,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

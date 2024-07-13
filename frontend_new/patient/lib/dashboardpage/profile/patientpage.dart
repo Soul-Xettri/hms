@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_new/Controller/AccController.dart';
 import 'package:frontend_new/welcomepage/welcomepage.dart';
+import 'package:provider/provider.dart';
 import '../dashboardpage.dart';
 import '../api for profile/profile.dart';
 import 'setting/settingpage.dart';
@@ -7,12 +9,17 @@ import 'setting/settingpage.dart';
 void main() {
   runApp(MaterialApp(
     home: PatientPage(),
+    theme: ThemeData(
+      primarySwatch: Colors.blue,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+    ),
   ));
 }
 
 class PatientPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final data = context.watch<PaDataProvider>().account?.value;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
@@ -23,8 +30,8 @@ class PatientPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      DashboardPage(firstName: '',)), // Navigate back to the dashboard
+                builder: (context) => DashboardPage(firstName: ''),
+              ), // Navigate back to the dashboard
             );
           },
         ),
@@ -47,30 +54,34 @@ class PatientPage extends StatelessWidget {
             Container(
               color: Colors.blue,
               width: double.infinity,
-              child: const Column(
+              child: Column(
                 children: [
-                  SizedBox(height: 10.0),
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundImage: AssetImage(
-                        'assets/image/doctor.jpg'), // Add your avatar image path
+                  const SizedBox(height: 10.0),
+                  const CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.blue,
+                    child: Icon(
+                      Icons.person,
+                      size: 50,
+                      color: Colors.white,
+                    ), // Add your avatar image path
                   ),
-                  SizedBox(height: 10.0),
+                  const SizedBox(height: 10.0),
                   Text(
-                    'Ram bahadur',
-                    style: TextStyle(color: Colors.white, fontSize: 24.0),
+                    '${data?.fname ?? 'User'} ${data?.lname ?? ''}',
+                    style: const TextStyle(color: Colors.white, fontSize: 24.0),
                   ),
-                  SizedBox(height: 10.0),
+                  const SizedBox(height: 10.0),
                 ],
               ),
             ),
             Container(
-              padding: const EdgeInsets.all(5.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   const SizedBox(height: 16.0),
                   _buildProfileListOption(
-                      'Settings', Icons.settings, Colors.red, context),
+                      'Settings', Icons.settings, Colors.blue, context),
                   _buildProfileListOption(
                       'Sign Out', Icons.logout, Colors.red, context),
                 ],
@@ -94,7 +105,9 @@ class PatientPage extends StatelessWidget {
           if (index == 0) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DashboardPage(firstName: '',)),
+              MaterialPageRoute(
+                builder: (context) => DashboardPage(firstName: ''),
+              ),
             );
           } else if (index == 1) {
             Navigator.push(
@@ -112,8 +125,7 @@ class PatientPage extends StatelessWidget {
     return ListTile(
       leading: Icon(icon, color: color),
       title: Text(title),
-      trailing: const Icon(Icons.arrow_forward_ios,
-          color: Color.fromARGB(255, 41, 9, 226)),
+      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.blue),
       onTap: () {
         // Navigate to the respective page based on the title
         if (title == 'Settings') {
@@ -133,26 +145,34 @@ class PatientPage extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          title: const Column(
-            children: [
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          title: Column(
+            children: const [
               Icon(
-                Icons.error_outline,
+                Icons.logout,
                 size: 50,
                 color: Colors.red,
               ),
               SizedBox(height: 10),
-              Text('Logout'),
+              Text(
+                'Logout',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           content: const Text(
-              'Thank You for using Mero Doctor\n\nAre you sure you want to logout?'),
+            'Thank you for using Mero Doctor.\n\nAre you sure you want to logout?',
+            textAlign: TextAlign.center,
+          ),
           actions: <Widget>[
             TextButton(
               child: const Text(
                 'No',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: Colors.blue, fontSize: 18),
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -161,16 +181,22 @@ class PatientPage extends StatelessWidget {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
-                backgroundColor: Colors.red, // foreground
+                backgroundColor: Colors.red, // background color
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
               ),
-              child: const Text('Yes'),
+              child: const Text('Yes', style: TextStyle(fontSize: 18)),
               onPressed: () {
                 Navigator.of(context).pop();
                 // Implement your logout functionality here
                 // For example, navigate to a sign-out page
-                Navigator.push(
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => WelcomePage()),
+                  (Route<dynamic> route) => false,
                 );
               },
             ),

@@ -30,7 +30,9 @@ class Dashboard extends StatelessWidget {
               // Navigate to the search page or show search bar
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Searchpage()), // Fixed the class name here
+                MaterialPageRoute(
+                    builder: (context) =>
+                        Searchpage()), // Fixed the class name here
               );
             },
           ),
@@ -49,8 +51,6 @@ class Searchpage extends StatefulWidget {
 }
 
 class _SearchpageState extends State<Searchpage> {
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +62,8 @@ class _SearchpageState extends State<Searchpage> {
             Navigator.pop(context); // Implement back button functionality
           },
         ),
-        backgroundColor: Colors.blue, // Ensure the AppBar background color is consistent
+        backgroundColor:
+            Colors.blue, // Ensure the AppBar background color is consistent
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

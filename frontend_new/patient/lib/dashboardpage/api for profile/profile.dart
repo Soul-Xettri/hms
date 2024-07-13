@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart';
+import 'package:frontend_new/Controller/AccController.dart';
+import 'package:provider/provider.dart';
+import '../dashboardpage.dart';
 import 'editprofilepage.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -8,54 +12,9 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String firstName = 'Ram bahadur';
-  String lastName = 'Gurung';
-  String address = 'Bhajapatan';
-  String city = 'Pokhara';
-  String pnm = '01';
-  String gender = 'male';
-  double weight = 70;
-  int age = 20;
-  String description = 'Healthy';
+  bool isLoading = false;
 
-  bool isLoading = false; // Track loading state
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchProfile();
-  }
-
-  Future<void> _fetchProfile() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      final profile = await ApiService.fetchProfile();
-
-      setState(() {
-        firstName = profile['firstName'];
-        lastName = profile['lastName'];
-        address = profile['address'];
-        city = profile['city'];
-        pnm = profile['pnm'];
-        gender = profile['gender'];
-        weight = profile['weight'];
-        age = profile['age'];
-        description = profile['description'];
-        isLoading = false; // Reset loading state
-      });
-    } catch (e) {
-      // Handle error
-      print('Error fetching profile: $e');
-      setState(() {
-        isLoading = false; // Reset loading state on error
-      });
-    }
-  }
-
-  void _updateProfile(
+  Future<void> _updateProfile(
     String newFirstName,
     String newLastName,
     String newAddress,
@@ -64,44 +23,72 @@ class _ProfilePageState extends State<ProfilePage> {
     String newGender,
     double newWeight,
     int newAge,
-    String newDescription,
+    double newHeight,
   ) async {
     setState(() {
-      firstName = newFirstName;
-      lastName = newLastName;
-      address = newAddress;
-      city = newCity;
-      pnm = newPnm;
-      gender = newGender;
-      weight = newWeight;
-      age = newAge;
-      description = newDescription;
+      isLoading = true;
     });
 
     try {
-      await ApiService.updateProfile({
-        'firstName': newFirstName,
-        'lastName': newLastName,
-        'address': newAddress,
-        'city': newCity,
-        'pnm': newPnm,
-        'gender': newGender,
-        'weight': newWeight,
-        'age': newAge,
-        'description': newDescription,
-      });
+      final response = await http.put(
+        Uri.parse(
+            'http://127.0.0.1:8000/api/paupdate/1'), // Adjust the ID as needed
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'fname': newFirstName,
+          'lname': newLastName,
+          'address': newAddress,
+          'city': newCity,
+          'pnm': newPnm,
+          'gender': newGender,
+          'weight': newWeight.toString(),
+          'age': newAge.toString(),
+          'mh': newHeight.toString(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          isLoading = false;
+        });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => DashboardPage(firstName: newFirstName)),
+        );
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        // Handle error
+        print('Error updating profile: ${response.statusCode}');
+      }
     } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
       // Handle error
       print('Error updating profile: $e');
-      // Optionally revert changes in UI state on error
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final data = context.watch<PaDataProvider>().account?.value;
+    final firstName = data?.fname ?? '';
+    final lastName = data?.lname ?? '';
+    final address = data?.address ?? '';
+    final city = data?.city ?? '';
+    final pnm = data?.pnm ?? '';
+    final gender = data?.gender ?? '';
+    final weight = data?.weight?.toString() ?? '';
+    final age = data?.age?.toString() ?? '';
+    final height = data?.mh?.toString() ?? '';
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         title: Text('$firstName $lastName'),
       ),
       body: isLoading
@@ -129,7 +116,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     _buildProfileInfoRow(Icons.male, gender),
                     _buildProfileInfoRow(Icons.monitor_weight, '$weight kg'),
                     _buildProfileInfoRow(Icons.cake, '$age years old'),
-                    _buildProfileInfoRow(Icons.description, description),
+                    _buildProfileInfoRow(Icons.height, '$height cm'),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
@@ -143,9 +130,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               city: city,
                               pnm: pnm,
                               gender: gender,
-                              weight: weight,
-                              age: age,
-                              description: description,
+                              weight: double.tryParse(weight) ?? 0.0,
+                              age: int.tryParse(age) ?? 0,
+                              height: double.tryParse(height) ?? 0.0,
                               onSave: _updateProfile,
                             ),
                           ),
@@ -154,11 +141,17 @@ class _ProfilePageState extends State<ProfilePage> {
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
                         backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15.0,
+                          horizontal: 30.0,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
-                      child: const Text('Update Information'),
+                      child: const Text(
+                        'Update Information',
+                      ),
                     ),
                   ],
                 ),

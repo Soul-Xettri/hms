@@ -11,9 +11,11 @@ class PasswordResetPage extends StatefulWidget {
 class _PasswordResetPageState extends State<PasswordResetPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
-  String apiUrl = 'https://your-api-endpoint.com/reset-password'; // Replace with your API endpoint
+  String apiUrl =
+      'https://your-api-endpoint.com/reset-password'; // Replace with your API endpoint
 
   void _resetPassword() async {
     if (_formKey.currentState?.validate() ?? false) {
@@ -24,7 +26,6 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
       Map<String, dynamic> requestBody = {
         'newPassword': newPassword,
         'confirmPassword': confirmPassword,
-        // Add any additional parameters required by your API
       };
 
       // Send POST request
@@ -80,75 +81,97 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reset Password'),
+        backgroundColor: Colors.blue[800],
+        foregroundColor: Colors.white,
       ),
       body: Center(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Image.asset('assets/image/reset.png', height: 400.0),
-                  const SizedBox(height: 1.0),
-                  const Text(
-                    'Reset Password',
-                    style: TextStyle(fontSize: 42.0, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Image.asset('assets/image/reset.png', height: 200.0),
+                const SizedBox(height: 20.0),
+                const Text(
+                  'Reset Password',
+                  style: TextStyle(
+                    fontSize: 32.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
                   ),
-                  const SizedBox(height: 20.0),
-                  TextFormField(
-                    controller: _newPasswordController,
-                    decoration: InputDecoration(
-                      labelText: 'New Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _newPasswordController,
+                  decoration: InputDecoration(
+                    labelText: 'New Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
                     ),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your new password';
-                      }
-                      return null;
-                    },
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    prefixIcon: Icon(Icons.lock),
                   ),
-                  const SizedBox(height: 20.0),
-                  TextFormField(
-                    controller: _confirmPasswordController,
-                    decoration: InputDecoration(
-                      labelText: 'Confirm Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your new password';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _confirmPasswordController,
+                  decoration: InputDecoration(
+                    labelText: 'Confirm Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
                     ),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please confirm your password';
-                      }
-                      if (value != _newPasswordController.text) {
-                        return 'Passwords do not match';
-                      }
-                      return null;
-                    },
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    prefixIcon: Icon(Icons.lock),
                   ),
-                  const SizedBox(height: 20.0),
-                  ElevatedButton(
-                    onPressed: _resetPassword,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please confirm your password';
+                    }
+                    if (value != _newPasswordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: _resetPassword,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    backgroundColor: Colors.blue[800],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
                     ),
-                    child: const Text('Reset Password'),
                   ),
-                  TextButton(
-                    onPressed: _navigateToLogin,
-                    child: const Text('Back to Login'),
+                  child: const Text('Reset Password',
+                      style: TextStyle(fontSize: 18.0)),
+                ),
+                TextButton(
+                  onPressed: _navigateToLogin,
+                  child: const Text(
+                    'Back to Login',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

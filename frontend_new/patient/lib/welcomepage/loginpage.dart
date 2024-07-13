@@ -1,30 +1,12 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:frontend_new/Controller/AccController.dart';
-import 'package:frontend_new/model/AccModel.dart';
 import 'package:provider/provider.dart';
 import '../dashboardpage/dashboardpage.dart';
 import 'package:http/http.dart' as http;
 import '../dashboardpage/api for resetpassword/passwordresetpage.dart';
 import '../global.dart' as globals;
-
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Flutter Login Demo',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       home: DashboardPage(),
-//     );
-//   }
-// }
+import '../Controller/AccController.dart';
+import '../model/AccModel.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -41,47 +23,75 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
+    super.initState();
     _passwordVisible = false;
-  }
-
-  Future<void> register(BuildContext context) async {
-    print('yeta chu hai ma');
   }
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
       Uri url = Uri.parse('http://127.0.0.1:8000/api/login');
       var response = await http.post(url, body: {
         "email": _usernameController.text,
         "password": _passwordController.text,
       });
+
+      Navigator.of(context).pop(); // Close the loader
+
       try {
         if (response.statusCode == 200) {
           var jsonResult = jsonDecode(response.body);
           var result = Accmodel.fromJson(jsonResult);
           var userName = result.value?.fname;
           context.read<PaDataProvider>().setLoginStatusActive();
-          context.read<PaDataProvider>().setUserLoginData(userName!);
+          context.read<PaDataProvider>().setUserLoginData(result);
+          print(userName);
           Navigator.push(
-              // ignore: use_build_context_synchronously
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DashboardPage(
-                        firstName: userName,
-                      )));
+            // ignore: use_build_context_synchronously
+            context,
+            MaterialPageRoute(
+                builder: (context) => DashboardPage(
+                      firstName: userName,
+                    )),
+          );
         } else {
-          print('error');
+          _showErrorDialog('Invalid email or password');
         }
       } catch (e) {
-        print("Exception occured"); // Write your exception code
+        _showErrorDialog('An error occurred. Please try again.');
       }
-    } else {
-      // Perform action if validation is failed
-      print("Validation failed");
     }
   }
 
-  // }
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _navigateToResetPassword() {
     Navigator.push(
@@ -101,15 +111,9 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
-  //  (validation ko lagi)
   String? _passwordValidator(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your password';
-    }
-    final passwordRegex = RegExp(
-        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$');
-    if (!passwordRegex.hasMatch(value)) {
-      return 'Password must be at least 6 characters long and contain uppercase, lowercase, digit, and special character';
     }
     return null;
   }
@@ -119,79 +123,110 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login Page'),
+        backgroundColor: Colors.blue[800],
+        foregroundColor: Colors.white,
       ),
       body: Center(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  const SizedBox(height: 1.0),
-                  Image.asset('assets/image/logo1.png', height: 300.0),
-                  const SizedBox(height: 15.0),
-                  TextFormField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Image.asset('assets/image/logo1.png', height: 150.0),
+                const SizedBox(height: 30.0),
+                _buildTextField(
+                  controller: _usernameController,
+                  labelText: 'Email',
+                  validator: _emailValidator,
+                  icon: Icons.email,
+                ),
+                const SizedBox(height: 20.0),
+                _buildPasswordField(
+                  controller: _passwordController,
+                  labelText: 'Password',
+                  validator: _passwordValidator,
+                  icon: Icons.lock,
+                ),
+                const SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: _login,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    backgroundColor: Colors.blue[800],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      String pattern =
-                          r'^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
-                      RegExp regex = RegExp(pattern);
-                      if (!regex.hasMatch(value)) {
-                        return 'Enter a valid email address';
-                      }
-                      return null;
-                    },
                   ),
-                  const SizedBox(height: 20.0),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
+                  child: const Text('Login', style: TextStyle(fontSize: 18.0)),
+                ),
+                TextButton(
+                  onPressed: _navigateToResetPassword,
+                  child: const Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      // if (value.length < 8) {
-                      //   return 'Password must be at least 8 characters long';
-                      // }
-
-                      return null;
-                    },
                   ),
-                  const SizedBox(height: 20.0),
-                  ElevatedButton(
-                    onPressed: _login,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    ),
-                    child: const Text('Login'),
-                  ),
-                  TextButton(
-                    onPressed: _navigateToResetPassword,
-                    child: const Text('Forgot Password?'),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required String? Function(String?) validator,
+    required IconData icon,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        prefixIcon: Icon(icon),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+      ),
+      validator: validator,
+    );
+  }
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String labelText,
+    required String? Function(String?) validator,
+    required IconData icon,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: !_passwordVisible,
+      decoration: InputDecoration(
+        labelText: labelText,
+        prefixIcon: Icon(icon),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _passwordVisible ? Icons.visibility : Icons.visibility_off,
+          ),
+          onPressed: () {
+            setState(() {
+              _passwordVisible = !_passwordVisible;
+            });
+          },
+        ),
+      ),
+      validator: validator,
     );
   }
 }
